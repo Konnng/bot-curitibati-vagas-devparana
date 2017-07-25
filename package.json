@@ -1,7 +1,7 @@
 {
-  "name": "bot-infojobs-vagas",
+  "name": "bot-curitibati-vagas-devparana",
   "version": "1.0.0",
-  "description": "Node script to search for job vacancies on InfoJobs.com.br (Paraná only)",
+  "description": "Node script to search for job vacancies on curitibati.com.br (Paraná only)",
   "main": "index.js",
   "dependencies": {
     "cheerio": "^0.22.0",
@@ -27,13 +27,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Konnng/bot-infojobs-vagas-pr.git"
+    "url": "git+ssh://git@github.com:Konnng/bot-curitibati-vagas-devparana.git"
   },
   "author": "Konnng Agência Digital",
   "license": "MIT",
   "private": true,
   "bugs": {
-    "url": "https://github.com/Konnng/bot-infojobs-vagas-pr/issues"
+    "url": "https://github.com/Konnng/bot-curitibati-vagas-devparana/issues"
   },
-  "homepage": "https://github.com/Konnng/bot-infojobs-vagas-pr#readme"
+  "homepage": "https://github.com/Konnng/bot-curitibati-vagas-devparana"
 }
