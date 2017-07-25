@@ -1,0 +1,39 @@
+{
+  "name": "bot-infojobs-vagas",
+  "version": "1.0.0",
+  "description": "Node script to search for job vacancies on InfoJobs.com.br (Paraná only)",
+  "main": "index.js",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "fs-extra": "^2.0.0",
+    "lowdb": "^0.16.0",
+    "moment": "^2.17.1",
+    "object.map": "^1.0.0",
+    "path": "^0.12.7",
+    "q": "^1.4.1",
+    "request": "^2.81.0",
+    "slack-node": "^0.1.8",
+    "sleep-time": "^0.1.0",
+    "trim": "0.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.17.1",
+    "eslint-config-standard": "^7.0.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Konnng/bot-infojobs-vagas-pr.git"
+  },
+  "author": "Konnng Agência Digital",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/Konnng/bot-infojobs-vagas-pr/issues"
+  },
+  "homepage": "https://github.com/Konnng/bot-infojobs-vagas-pr#readme"
+}
