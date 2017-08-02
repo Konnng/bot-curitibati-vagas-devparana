@@ -11,7 +11,7 @@ const trim = require('trim')
 const sleep = require('sleep-time')
 const Slack = require('slack-node')
 
-const slackWebHook = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_PR || 'invalid'
+const slackWebHook = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_CURITIBA || ''
 const dbFile = path.join(__dirname, 'data/db.json')
 
 if (!fs.existsSync(path.dirname(dbFile)) && !fs.mkdirsSync(path.dirname(dbFile))) {
@@ -65,15 +65,6 @@ try {
         deferred.resolve(body)
       })
     })
-    //
-    // request('https://www.infojobs.com.br/vagas-de-emprego-programador-em-parana.aspx?Categoria=74&gridtype=2', (err, response, body) => {
-    //   if (err) {
-    //     return deferred.reject(err)
-    //   } else if (response.statusCode !== 200) {
-    //     return deferred.reject(`Error completing the resquest. Status Code => ${response.statusCode}`)
-    //   }
-    //   deferred.resolve(trim(body))
-    // })
   }
 
   Q.when(deferred.promise, html => {
@@ -187,7 +178,7 @@ try {
   _log('-'.repeat(100))
 }
 
-function _month2Number(month) {
+function _month2Number (month) {
   let months = {
     'jan': 1,
     'fev': 2,
