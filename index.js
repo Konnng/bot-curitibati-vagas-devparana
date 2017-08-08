@@ -24,14 +24,14 @@ const db = lowDb(dbFile, { storage: lowDbStorage })
 
 db.defaults({ jobs: [], settings: {} }).write()
 
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------ntand-----------------------
 
 let slack = new Slack()
 let deferred = Q.defer()
 let deferredProcessing = Q.defer()
 let deferredFinal = Q.defer()
 let htmlFileTests = path.join(__dirname, 'jobs.html')
-let sandBox = true
+let sandBox = false
 let httpClient = request.defaults({ jar: true })
 
 slack.setWebhook(slackWebHook)
@@ -75,7 +75,7 @@ try {
     let $ = cheerio.load(html)
     let jobsOffers = $('.container .vaga .item')
     if (!jobsOffers.length) {
-      throw new Error('No Job vaccancies was found.')
+      throw new Error('No Job vaccancies where found.')
     }
 
     jobsOffers = jobsOffers.map((index, element) => {
