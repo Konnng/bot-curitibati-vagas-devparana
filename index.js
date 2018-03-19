@@ -11,7 +11,7 @@ const trim = require('trim')
 const sleep = require('sleep-time')
 const Slack = require('slack-node')
 
-const slackWebHook = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_CURITIBA || ''
+const slackWebHook = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_CURITIBA || 'https://hooks.slack.com/services/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'
 const dbFile = path.join(__dirname, 'data/db.json')
 
 if (!fs.existsSync(path.dirname(dbFile)) && !fs.mkdirsSync(path.dirname(dbFile))) {
@@ -135,22 +135,20 @@ try {
     _log('-'.repeat(100))
 
     try {
+      const mainTitle = (jobs.length > 1 ? 'Vagas de trabalho encontradas. ' : 'Vaga de trabalho encontrada.') + ' Confira!'
+
       jobs.forEach((item, index) => {
         _log('Processing item ' + (index + 1))
 
-        let date = moment.unix(item.date).format('DD/MM/YYYY')
+        const date = moment.unix(item.date).format('DD/MM/YYYY')
+        const jobTitle = item.title.replace(new RegExp(item.city, 'ig'), '') + ` - ${item.city}`
 
         _log(item.title, date)
         _log('-'.repeat(100))
 
         let params = {
-          attachments: [{
-            title: `${item.title} - ${item.city}`,
-            title_link: item.url,
-            text: `Vaga: ${item.title}\nData: ${date}\nDetalhes: ${item.description}`,
-            color: '#7CD197'
-          }],
-          text: 'Vaga de trabalho encontrada. Confira! \n\n' + item.url
+          text: (index === 0 ? mainTitle + '\n\n\n' : '') +
+            `*${jobTitle}* - ${item.url}`
         }
 
         slack.webhook(params, (err, response) => {
