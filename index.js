@@ -122,7 +122,7 @@ try {
   })
 
   Q.when(deferredFinal.promise).then(() => {
-    let jobs = db.get('jobs').filter({ botProcessed: false }).sortBy('date').reverse().value()
+    let jobs = Array.from(db.get('jobs').filter({ botProcessed: false }).sortBy('date').reverse().value())
 
     _log(`Found ${jobs.length} job offers.`)
 
