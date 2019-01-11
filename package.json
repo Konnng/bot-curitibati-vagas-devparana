@@ -4,15 +4,15 @@
   "description": "Node script to search for job vacancies on curitibati.com.br (Paraná only)",
   "main": "index.js",
   "dependencies": {
+    "@slack/client": "^4.8.0",
     "cheerio": "^0.22.0",
     "fs-extra": "^2.0.0",
-    "lowdb": "^0.16.0",
+    "lowdb": "0.16.0",
     "moment": "^2.17.1",
     "object.map": "^1.0.0",
     "path": "^0.12.7",
     "q": "^1.4.1",
     "request": "^2.81.0",
-    "slack-node": "^0.1.8",
     "sleep-time": "^0.1.0",
     "trim": "0.0.1"
   },

@@ -9,32 +9,35 @@ const lowDbStorage = require('lowdb/lib/storages/file-sync')
 const objectMap = require('object.map')
 const trim = require('trim')
 const sleep = require('sleep-time')
-const Slack = require('slack-node')
+const { IncomingWebhook: SlackIncomingWebhook, WebClient: SlackWebClient } = require('@slack/client')
 
-const slackWebHook = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_CURITIBA || ''
+const SLACK_WEBHOOK = process.env.LABS_SLACK_WEBHOOK_URL_DEVPARANA_BOT_CURITIBA || ''
+const SLACK_BOT_TOKEN = process.env.LABS_SLACK_BOT_VAGAS_TOKEN_DEVPARANA || ''
+
 const dbFile = path.join(__dirname, 'data/db.json')
 
 if (!fs.existsSync(path.dirname(dbFile)) && !fs.mkdirsSync(path.dirname(dbFile))) {
   throw new Error('Error creating data dir.')
-} else if (!slackWebHook) {
-  throw new Error('Slack Webhook not found in enviroment variables. Aborting...')
+} else if (!SLACK_WEBHOOK || !SLACK_BOT_TOKEN) {
+  _log('ERROR: SLACK_WEBHOOK or SLACK_BOT_TOKEN are undefined.')
+  _log('Aborting...')
+  process.exit(1)
 }
 
 const db = lowDb(dbFile, { storage: lowDbStorage })
 
 db.defaults({ jobs: [], settings: {} }).write()
 
-// --------------------------------------------------------------------------ntand-----------------------
+// -------------------------------------------------------------------------------------------------
 
-let slack = new Slack()
+const slackClient = new SlackWebClient(SLACK_BOT_TOKEN)
+
 let deferred = Q.defer()
 let deferredProcessing = Q.defer()
 let deferredFinal = Q.defer()
 let htmlFileTests = path.join(__dirname, 'jobs.html')
 let sandBox = false
 let httpClient = request.defaults({ jar: true })
-
-slack.setWebhook(slackWebHook)
 
 _log('Searching for new job offers...')
 
@@ -130,15 +133,17 @@ try {
       _log('Processing items to send to slack...')
     } else {
       _log('No new jobs to send to slack...')
+      return false
     }
 
     _log('-'.repeat(100))
 
     try {
-      const mainTitle = (jobs.length > 1 ? 'Vagas de trabalho encontradas. ' : 'Vaga de trabalho encontrada.') + ' Confira!'
       const slackQueue = jobs.map((item, index) => {
-        return () => new Promise((resolve, reject) => {
+        return (thread) => new Promise((resolve, reject) => {
           _log('Processing item ' + (index + 1))
+
+          const slackWebhook = new SlackIncomingWebhook(SLACK_WEBHOOK)
 
           const date = moment.unix(item.date).format('DD/MM/YYYY')
           const jobTitle = item.title.replace(new RegExp(item.city, 'ig'), '') + ` - ${item.city}`
@@ -146,33 +151,44 @@ try {
           _log(item.title, date)
           _log('-'.repeat(100))
 
-          let params = {
-            text: (index === 0 ? mainTitle + '\n\n\n' : '') +
-            `*${jobTitle}* - ${item.url}`
+          const params = {
+            text: `*${jobTitle}* - ${item.url}`
           }
 
-          slack.webhook(params, (err, response) => {
+          if (thread) {
+            params.thread_ts = thread
+          }
+
+          slackWebhook.send(params, (err, response) => {
             if (err) {
               return reject(err)
             }
-            if (response.statusCode === 200) {
-              _log('Done posting item ' + (index + 1))
-              _log('-'.repeat(100))
-              db.get('jobs').find({ id: item.id }).assign({ botProcessed: true, botProcessedDate: moment().unix() }).write()
-              sleep(1000)
 
-              resolve(index)
-            } else {
-              reject(new Error('Error processing item ' + (index + 1) + ': ' + response.statusCode + ': ' + response.statusMessage))
-            }
+            _log('Done posting item ' + (index + 1))
+            _log('-'.repeat(100))
+
+            db.get('jobs').find({ id: item.id }).assign({ botProcessed: true, botProcessedDate: moment().unix() }).write()
+
+            sleep(1000)
+            resolve(index)
           })
         })
       })
 
-      Array.from(Array(slackQueue.length).keys()).reduce((promise, next) => {
-        return promise.then(() => slackQueue[next]()).catch(err => { throw err })
-      }, Promise.resolve())
+      slackClient.chat.postMessage({
+        text: (jobs.length > 1 ? 'Vagas de trabalho encontradas' : 'Vaga de trabalho encontrada') + ' em *Curitiba e Região*. Confira!',
+        channel: '#vagas'
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error(response.error)
+        }
 
+        const thread = response.ts
+
+        Array.from(Array(slackQueue.length).keys()).reduce((promise, next) => {
+          return promise.then(() => slackQueue[next](thread).catch(err => { throw err })).catch(err => { throw err })
+        }, Promise.resolve())
+      }).catch(err => { throw err })
     } catch (err) {
       _log('ERROR: ', err)
       _log('-'.repeat(100))
